@@ -1,0 +1,115 @@
+/* Normalize */
+body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form, fieldset, input, p, blockquote, th, td, legend {
+	margin: 0;
+	padding: 0;
+}
+h1,h2,h3,h4,h5,h6 { font-family: Arial, Helvetica, sans-serif; font-weight: bold; font-size: 100%; width: 300px;}
+address, caption, cite, code, dfn, th, var { font-style: normal; font-weight: normal; }
+table { border-collapse: collapse; border-spacing: 0; }
+fieldset,img { border: 0; }
+caption,th { text-align: left; }
+/* @end */
+
+
+#main-wrapper {
+    width: 960px;
+    margin: 0 auto;
+}
+/*On mouse hover lighten CD color*/
+path:hover {
+	stroke: #eef442;
+	stroke-width: 2px;
+	fill-opacity: .7;
+
+	
+}
+
+#metrics { width: 920px; margin: 0 auto 15px 0; font-family: Helvetica, sans-serif; }
+
+
+#metrics h3 { font-size: 14px; font-family: Helvetica, sans-serif; text-align: left; margin-bottom: 0; }
+#metrics ul { font-size: 12px; font-family: Helvetica, sans-serif; margin-left: 0; padding: 0; }
+#metrics ul li { 
+    list-style: none; 
+    margin: 10px 10px 0 0; 
+    padding: 4px 0; 
+    display: block;
+    width: 65px;
+    text-align: center;
+    font-size: 11px;
+    border: 1px solid #e0e0e0;
+	position: relative;
+	left:55px;
+	top:4px;
+}
+
+#metrics ul li.bottom { margin-bottom: 0; }
+#metrics #motor { width: 200px; float: left; margin-right: 15px; height: 5px}
+#metrics .block-button { width: 80px; display: block; float:left; clear:both; }
+
+#metrics em {
+	list-style: none;
+	margin: 10px 10px 0 0;
+	padding: 4px 0;
+	display: block;
+	width: 200px;
+	text-align: left;
+	font-size: 10px;
+	position: relative;
+	left: 55px;
+	top: 5px;
+}
+div.tooltip h3 { 
+  font-size: 16px; margin: 0 0 7px 0; 
+  line-height: 1.2em;
+  text-align: left;
+}
+div.tooltip .line { clear: both; margin-top: 3px; font-size: 14px; }
+
+div.tooltip .val { float: right; color: red; font-weight: bold; width: 75px; text-align: left; margin-right: 8px; }
+
+.overlay {
+  fill: none;
+  pointer-events: all;
+}
+.button { fill: #000; }
+.counties {
+  fill: #e0e0e0;
+}
+.states {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 1.5px;
+  stroke-linejoin: round;
+}
+
+.counties path.selected {
+    stroke: #000;
+    stroke-width: 0.5px;
+}
+.collection {
+	stroke: #000;
+	stroke-width: .5px;
+}
+
+
+/* .dm path:hover { */
+	/* stroke: #eef442; */
+	/* stroke-width: 2px; */
+	/* fill-opacity: .7; */
+	
+/* } */
+#chart1 {
+	margin-left: 750px;
+	margin-top: -555px;
+}
+#permitchart {
+	margin-left: 600px;
+	margin-top: -720px;
+}	
+
+path.NODATA { fill: #fff; stroke-width: .5px }
+
+cursor:default;
+
+.clr { clear: both; }

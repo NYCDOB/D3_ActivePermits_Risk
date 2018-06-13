@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Active Permits Risk Screening Tool</title>
+
+<style type="text/css">
+html { 
+	height: 100% 
+}
+body { 
+	height: 100%; 
+	margin: 0; 
+	padding: 0;
+	font-size: 12px;
+	font-family: Arial, Helvetica, sans-serif;	
+}
+#map {
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	background-color: #333;
+	pointer-events: all;
+}
+div.tooltip {
+	color: #222;
+	background: #fff;
+	padding: .5em;
+	text-shadow: #f5f5f5 0 1px 0;
+	border-radius: 7px; 
+	box-shadow: 0px 0px 2px 0px #a6a6a6; 
+	opacity: 0.9; 
+	position: absolute;
+	visibility: hidden;
+}
+.ui {
+	top: 10px;
+	left: 50px;
+	padding: 8px;
+	position: absolute;
+	background-color: #fff;
+	border: 2px solid #707070;
+	border-radius: 7px;
+	width: 280px;
+}
+.high {
+	fill: #BF0000;
+	fill-opacity: .7;
+}
+.medium {
+	fill: #F57A00;
+	fill-opacity: .5;
+}
+.low {
+	fill: #BCB92F;
+	fill-opacity: .5;
+}
+<!-- .other { -->
+	<!-- fill: #e5e7ea; -->
+	<!-- fill-opacity: .5;	 -->
+<!-- } -->
+</style>
+    <link href='https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css'
+    	rel='stylesheet' type='text/css'/>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+
+</head>
+<body>
+	<div id="map">
+		<div id="ui-container" class="ui" style="z-index: 401">		
+			      <h4>Active Permits (As of <span id="today"></span>)</h4>
+				  <h5>Risk Category</h5>
+				  
+				  <span style="display:inline-block; background-color:#BF0000; padding:0px; margin:0px; height:13px; width:13px; overflow:hidden"><input type="checkbox" style="opacity:0.50;padding:0px;margin:0px" name="risk" class="regular-checkbox" value="highRisk" id="highRisk" checked="true"/></span>
+					<label for="highRisk"></label><span class="en">High Risk</span>
+				  <br/>
+				  
+				  <span style="display:inline-block; background-color:#F57A00; padding:0px; margin:0px; height:13px; width:13px; overflow:hidden"><input type="checkbox" style="opacity:0.50;padding:0px;margin:0px" name="risk" class="regular-checkbox" value="medRisk" id="medRisk" checked="true"/></span>
+					<label for="medRisk"></label><span class="en">Medium Risk</span>
+				  <br/>
+				  
+				  <span style="display:inline-block; background-color:#bcb92f; padding:0px; margin:0px; height:13px; width:13px; overflow:hidden"><input type="checkbox" style="opacity:0.50;padding:0px;margin:0px" name="risk" class="regular-checkbox" value="lowRisk" id="lowRisk" /></span>
+					<label for="lowRisk"></label><span class="en">Low Risk</span>
+				  <br/>
+				  
+				  <!-- <span style="display:inline-block; background-color:#e5e7ea; padding:0px; margin:0px; height:13px; width:13px; overflow:hidden"><input type="checkbox" style="opacity:0.50;padding:0px;margin:0px" name="vio" class="regular-checkbox" value="other" id="other" /></span> -->
+					<!-- <label for="other"></label><span class="en">Other</span> -->
+				  <!-- <br/>			 -->
+		</div>
+	</div>
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.9/d3.min.js"></script>
+<script src="Leaflet.D3SvgOverlay-master/L.D3SvgOverlay.min.js"></script>
+<script src="jquery-2.1.1.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<script>
+
+
+
+	var today = new Date();
+	var dd = today.getDate();
+	var mm = today.getMonth()+1;
+	var yyyy = today.getFullYear();
+	today = mm + '/' + dd + '/' + yyyy;	
+	d3.select("#today").html(today);
+<!-- var grayscale = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png', {attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'});  -->
+<!-- var	streets = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png', {attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'});  -->
+	
+<!-- var map = L.map('map', { -->
+	<!-- center: [40.734063, -73.958424], -->
+	<!-- zoom: 11, -->
+	<!-- layers: [grayscale, streets] -->
+<!-- }); -->
+<!-- var baseMaps = { -->
+	<!-- "Grayscale": grayscale, -->
+	<!-- "Streets": streets -->
+
+	
+<!-- }; -->
+<!-- L.control.layers(baseMaps).addTo(map); -->
+
+var map = L.map('map').setView([40.712824, -74.005999], 11);
+L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png', {attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
+
+var tooltip = d3.select('body').append('div')
+	.attr('class', 'tooltip');
+	
+var width = $("#map").width(),
+	height = $("#map").height();
+
+
+function init(){	
+	var points = [];
+	var pointsOverlay = L.d3SvgOverlay(function(sel,proj){
+		
+	var pointsUpd = sel.selectAll('circle').data(points);
+
+	pointsUpd.enter()
+		.append('circle')
+		.attr('cx',function(d){return proj.latLngToLayerPoint(d.latLng).x;})
+		.attr('cy',function(d){return proj.latLngToLayerPoint(d.latLng).y;})
+		.attr('class', function(d){
+			if (d.RISK > 6){
+				return "high";
+			} else if (d.RISK > 4 && d.RISK < 7){
+				return "medium";
+			}  
+				return "low";
+		})
+		.on('click', function(d){
+			tooltip.style("visibility", "visible");
+			tooltip.html(
+				'BIN: ' + d.bin + '</br>' +								
+				'ADDRESS: '+ d.houseNum +' '+d.street + ', ' + (d.BoroughName).toUpperCase() + '</br>' +
+				'RISK SCORE: ' + d.risk
+			)
+			if (d3.event.pageX > (width - 200)) {
+			   tooltip.style("left", (d3.event.pageX - 350) + "px");
+			} else {
+			   tooltip.style("left", (d3.event.pageX + 20) + "px")
+					.style("top", (d3.event.pageY -30) + "px");
+			}
+			if (d3.event.pageY > (height - 150)) {
+			   tooltip.style("top", (d3.event.pageY -100) + "px");
+			} else {
+			   tooltip.style("top", (d3.event.pageY -30) + "px");
+			}				
+		})
+		.on("mousemove", function(d){
+			$(this).attr("style", "cursor: pointer; fill: #eef442; fill-opacity: 1;");
+		})
+
+		.on("mouseout", function(){
+			$(this).attr("style", "stroke-width: 0px; fill-opacity: .5;");
+			return tooltip.style("visibility", "hidden");
+		});
+
+		//pointsUpd.attr('r', 3 / proj.scale);
+		pointsUpd.attr('r', function(d){
+			if (d.RISK > 6){
+				return (6 / proj.scale);
+			} else if (d.RISK > 4 && d.RISK < 7){
+				return (4 / proj.scale);
+			}
+				return (2 / proj.scale);
+		})
+
+	});
+	
+
+	d3.csv("data/SiteSafetyAutomationOutput.csv",function(data){
+				points = data.map(function(d){
+				d.latLng = [+d.LATITUDE_POINT_Y,+d.LONGITUDE_POINT_X];
+				d.bin = [d.BIN];				
+				d.houseNum = [d.HouseNumber];
+				d.street = [d.StreetName];
+				d.borough = [d.BoroughName];
+				d.risk = [d.RISK];
+			return d;
+			});
+		pointsOverlay.addTo(map);
+		//d3.selectAll(".medium").style("display", "none");
+		d3.selectAll(".low").style("display", "none");
+	});
+	
+
+}
+
+var highCheckbox = document.querySelector('input[id="highRisk"]');
+	medCheckbox = document.querySelector('input[id="medRisk"]');
+	lowCheckbox = document.querySelector('input[id="lowRisk"]');
+
+highCheckbox.onchange = function(){
+		if(this.checked){
+			d3.selectAll(".high").filter(function(d) {
+				return d.RISK > 6;
+			})
+			.style("display", "block");	
+
+		} else {
+			d3.selectAll(".high").filter(function(d) {
+				return d.RISK > 6;
+			})
+			.style("display", "none");
+						
+		}
+};	
+medCheckbox.onchange = function(){
+		if(this.checked){
+			d3.selectAll(".medium").filter(function(d) {
+				return d.RISK > 4 && d.RISK < 7;
+			})
+			.style("display", "block");	
+
+		} else {
+			d3.selectAll(".medium").filter(function(d) {
+				return d.RISK > 4 && d.RISK < 7;
+			})
+			.style("display", "none");
+						
+		}
+};
+lowCheckbox.onchange = function(){
+		if(this.checked){
+			d3.selectAll(".low").filter(function(d) {
+				return d.RISK < 5;
+			})
+			.style("display", "block");	
+
+		} else {
+			d3.selectAll(".low").filter(function(d) {
+				return d.RISK < 5;
+			})
+			.style("display", "none");
+						
+		}
+};
+
+init();
+
+</script>
+    
+</body>
+</html>

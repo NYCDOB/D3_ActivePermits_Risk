@@ -180,12 +180,33 @@ function init(){
 		//pointsUpd.attr('r', 3 / proj.scale);
 		pointsUpd.attr('r', function(d){
 			if (d.RISK > 6){
-				return (6 / proj.scale);
+				<!-- return (6 / proj.scale); -->
+				return (5 / proj.scale);
 			} else if (d.RISK > 4 && d.RISK < 7){
 				return (4 / proj.scale);
 			}
 				return (2 / proj.scale);
 		})
+		
+		var highRiskPnts = d3.selectAll(".high");
+		pulsate(highRiskPnts);
+		
+		function pulsate(highRiskPnts){
+			recursive_transitions();
+			function recursive_transitions(){
+			highRiskPnts.transition()
+				.duration(100)
+				.attr("stroke-width", 2)
+				.attr("r", 5 / proj.scale)
+				.ease('sin-in')
+				.transition()
+				.duration(800)
+				.attr('stroke-width', 3)
+				.attr("r", 8 / proj.scale)
+				.ease('sine')
+				.each("end", recursive_transitions);
+			}
+		}	
 
 	});
 	
@@ -202,8 +223,26 @@ function init(){
 			});
 		pointsOverlay.addTo(map);
 		//d3.selectAll(".medium").style("display", "none");
+		<!-- var highRiskPnts = d3.selectAll(".high"); -->
+		<!-- pulsate(highRiskPnts); -->
 		d3.selectAll(".low").style("display", "none");
 	});
+	<!-- function pulsate(highRiskPnts){ -->
+	<!-- recursive_transitions(); -->
+	<!-- function recursive_transitions(){ -->
+	<!-- highRiskPnts.transition() -->
+		<!-- .duration(100) -->
+		<!-- .attr("stroke-width", 2) -->
+		<!-- .attr("r", 5) -->
+		<!-- .ease('sin-in') -->
+		<!-- .transition() -->
+		<!-- .duration(800) -->
+		<!-- .attr('stroke-width', 3) -->
+		<!-- .attr("r", 8) -->
+		<!-- .ease('sine') -->
+		<!-- .each("end", recursive_transitions); -->
+	<!-- } -->
+<!-- } -->
 	
 
 }
@@ -212,12 +251,14 @@ var highCheckbox = document.querySelector('input[id="highRisk"]');
 	medCheckbox = document.querySelector('input[id="medRisk"]');
 	lowCheckbox = document.querySelector('input[id="lowRisk"]');
 
+
+
 highCheckbox.onchange = function(){
 		if(this.checked){
 			d3.selectAll(".high").filter(function(d) {
 				return d.RISK > 6;
 			})
-			.style("display", "block");	
+			.style("display", "block");
 
 		} else {
 			d3.selectAll(".high").filter(function(d) {

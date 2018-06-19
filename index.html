@@ -54,6 +54,8 @@ div.tooltip {
 	fill: #BCB92F;
 	fill-opacity: .5;
 }
+#vis{
+}
 <!-- .other { -->
 	<!-- fill: #e5e7ea; -->
 	<!-- fill-opacity: .5;	 -->
@@ -86,6 +88,7 @@ div.tooltip {
 					<!-- <label for="other"></label><span class="en">Other</span> -->
 				  <!-- <br/>			 -->
 		</div>
+		<div id="viz"></div>
 	</div>
     
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
@@ -142,9 +145,9 @@ function init(){
 		.attr('cx',function(d){return proj.latLngToLayerPoint(d.latLng).x;})
 		.attr('cy',function(d){return proj.latLngToLayerPoint(d.latLng).y;})
 		.attr('class', function(d){
-			if (d.RISK > 6){
+			if (d.Score > 6){
 				return "high";
-			} else if (d.RISK > 4 && d.RISK < 7){
+			} else if (d.Score > 4 && d.Score < 7){
 				return "medium";
 			}  
 				return "low";
@@ -153,8 +156,13 @@ function init(){
 			tooltip.style("visibility", "visible");
 			tooltip.html(
 				'BIN: ' + d.bin + '</br>' +								
-				'ADDRESS: '+ d.houseNum +' '+d.street + ', ' + (d.BoroughName).toUpperCase() + '</br>' +
-				'RISK SCORE: ' + d.risk
+				//'ADDRESS: '+ d.houseNum +' '+d.street + ', ' + (d.BoroughName).toUpperCase() + '</br>' +
+				'RISK SCORE: ' + d.risk + '</br>' +
+				'# OF PERMITS: ' + d.NumPermits + '</br>' +
+				'# OF STORIES: ' + d.NumStories + '</br>' +
+				'NB PERMIT: ' + d.NB + '</br>' +
+				'SCAFFOLD/SHED/FENCE: ' + d.Scaffold + '</br>' +
+				'# OF ACCIDENTS: ' +d.Accidents
 			)
 			if (d3.event.pageX > (width - 200)) {
 			   tooltip.style("left", (d3.event.pageX - 350) + "px");
@@ -179,15 +187,15 @@ function init(){
 
 		//pointsUpd.attr('r', 3 / proj.scale);
 		pointsUpd.attr('r', function(d){
-			if (d.RISK > 6){
-				<!-- return (6 / proj.scale); -->
-				return (5 / proj.scale);
-			} else if (d.RISK > 4 && d.RISK < 7){
+			if (d.Score > 6){
+				return (6 / proj.scale);
+				//return (1 / proj.scale);
+			} else if (d.Score > 4 && d.Score < 7){
 				return (4 / proj.scale);
 			}
 				return (2 / proj.scale);
 		})
-		
+
 		var highRiskPnts = d3.selectAll(".high");
 		pulsate(highRiskPnts);
 		
@@ -195,56 +203,131 @@ function init(){
 			recursive_transitions();
 			function recursive_transitions(){
 			highRiskPnts.transition()
-				.duration(100)
-				.attr("stroke-width", 2)
-				.attr("r", 5 / proj.scale)
+				<!-- .attr("class", "ring") -->
+				<!-- .style("fill", "#BF0000") -->
+				<!-- .attr("stroke", "#BF0000") -->
+				<!-- .style("opacity", 0.9) -->
+				<!-- .style("fill-opacity", 0.35) -->
+				
+				
+				.duration(500)
+				.attr("stroke-width", 1.5)
+				.attr("r", 1 / proj.scale)
 				.ease('sin-in')
 				.transition()
-				.duration(800)
-				.attr('stroke-width', 3)
+				.duration(500)
+				.attr('stroke-width', 1.5)
 				.attr("r", 8 / proj.scale)
-				.ease('sine')
+				.ease('sine-out')
+				//.style("opacity", 0)
 				.each("end", recursive_transitions);
 			}
 		}	
+		
 
+
+
+/*		
+		//__vis apped    
+		var viz = d3.select("#viz")
+			.append("svg")
+			.attr("width", width)
+			.attr("height", height)
+				.append("g")
+				.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")		
+			
+			
+		 //_place holder for rings								
+		 var speedLineGroup = viz.append("g")
+			 .attr("class", "speedlines");
+
+
+		function getDurationPerDot(circleData){
+			var totalTime = 3000;//3 seconds max
+			<!-- var time = totalTime-(circleData.alarmLevel*10) -->
+			<!-- return time; -->
+		}
+
+		function getOuterRadiusPerDot(circleData){
+			var radius = 20;
+			<!-- var radius = circleData.alarmLevel*.5; -->
+			<!-- return radius; -->
+		}
+
+        //invoke rings
+        makeRings()
+                        
+ //window.setInterval(makeRings, 1000);
+
+		function makeRings() {
+			var datapoints = d3.selectAll("circle.high");
+			var radius = 1;
+		  
+				function myTransition(circleData){
+					
+					var transition = d3.select(this).transition();
+						
+						//var duration = getDurationPerDot(circleData);
+						//var outerRadius = getOuterRadiusPerDot(circleData);
+						var duration = 3000;
+						var outerRadius = 15;
+
+						speedLineGroup.append("circle")
+							.attr({
+								"class": "ring",
+								"fill":"#f25c19",
+								"stroke":"#f25c19",
+								"stroke-width": 1.5,
+								"cx": circleData.xcoord,
+								"cy": circleData.ycoord,
+								"r":radius,
+								"opacity": 0.35,
+								"fill-opacity":0.35
+							})
+							.transition()
+							.duration(6000)
+							.attr("r", radius + outerRadius )
+							.attr("opacity", 0)
+							.remove();
+				 
+					var t= setInterval(function(){
+						clearInterval(t);
+						myTransition(circleData)
+					},700);
+					 
+					//transition.each('end', myTransition);
+				}
+	 
+		  
+		  datapoints.each(myTransition);
+		}	
 	});
+*/
+
+
+		
+});
+
 	
 
 	d3.csv("data/SiteSafetyAutomationOutput.csv",function(data){
 				points = data.map(function(d){
-				d.latLng = [+d.LATITUDE_POINT_Y,+d.LONGITUDE_POINT_X];
+				d.latLng = [+d.Lat,+d.Lon];
 				d.bin = [d.BIN];				
-				d.houseNum = [d.HouseNumber];
-				d.street = [d.StreetName];
-				d.borough = [d.BoroughName];
-				d.risk = [d.RISK];
+				//d.houseNum = [d.HouseNumber];
+				//d.street = [d.StreetName];
+				//d.borough = [d.BoroughName];
+				d.NumPermits = (d['Number of Permits']);
+				d.NumStories = (d['Number of Stories']);
+				d.NB = [d.NB];
+				d.Scaffold = [d.ScaffoldShedFence];
+				d.Accidents = [d.Accidents];
+				d.risk = [d.Score];
 			return d;
 			});
 		pointsOverlay.addTo(map);
-		//d3.selectAll(".medium").style("display", "none");
-		<!-- var highRiskPnts = d3.selectAll(".high"); -->
-		<!-- pulsate(highRiskPnts); -->
 		d3.selectAll(".low").style("display", "none");
 	});
-	<!-- function pulsate(highRiskPnts){ -->
-	<!-- recursive_transitions(); -->
-	<!-- function recursive_transitions(){ -->
-	<!-- highRiskPnts.transition() -->
-		<!-- .duration(100) -->
-		<!-- .attr("stroke-width", 2) -->
-		<!-- .attr("r", 5) -->
-		<!-- .ease('sin-in') -->
-		<!-- .transition() -->
-		<!-- .duration(800) -->
-		<!-- .attr('stroke-width', 3) -->
-		<!-- .attr("r", 8) -->
-		<!-- .ease('sine') -->
-		<!-- .each("end", recursive_transitions); -->
-	<!-- } -->
-<!-- } -->
-	
-
 }
 
 var highCheckbox = document.querySelector('input[id="highRisk"]');
@@ -256,13 +339,13 @@ var highCheckbox = document.querySelector('input[id="highRisk"]');
 highCheckbox.onchange = function(){
 		if(this.checked){
 			d3.selectAll(".high").filter(function(d) {
-				return d.RISK > 6;
+				return d.Score > 6;
 			})
 			.style("display", "block");
 
 		} else {
 			d3.selectAll(".high").filter(function(d) {
-				return d.RISK > 6;
+				return d.Score > 6;
 			})
 			.style("display", "none");
 						
@@ -271,13 +354,13 @@ highCheckbox.onchange = function(){
 medCheckbox.onchange = function(){
 		if(this.checked){
 			d3.selectAll(".medium").filter(function(d) {
-				return d.RISK > 4 && d.RISK < 7;
+				return d.Score > 4 && d.Score < 7;
 			})
 			.style("display", "block");	
 
 		} else {
 			d3.selectAll(".medium").filter(function(d) {
-				return d.RISK > 4 && d.RISK < 7;
+				return d.Score > 4 && d.Score < 7;
 			})
 			.style("display", "none");
 						
@@ -286,13 +369,13 @@ medCheckbox.onchange = function(){
 lowCheckbox.onchange = function(){
 		if(this.checked){
 			d3.selectAll(".low").filter(function(d) {
-				return d.RISK < 5;
+				return d.Score < 5;
 			})
 			.style("display", "block");	
 
 		} else {
 			d3.selectAll(".low").filter(function(d) {
-				return d.RISK < 5;
+				return d.Score < 5;
 			})
 			.style("display", "none");
 						

@@ -47,8 +47,8 @@ div.tooltip {
 	fill-opacity: .7;
 }
 .medium {
-	fill: #F57A00;
-	fill-opacity: .5;
+	fill: #c6891f;
+	fill-opacity: .7;
 }
 .low {
 	fill: #BCB92F;
@@ -56,6 +56,11 @@ div.tooltip {
 }
 #vis{
 }
+<!-- .rings { -->
+	<!-- fill: #d86666; -->
+	<!-- fill-opacity: .35; -->
+	
+<!-- } -->
 <!-- .other { -->
 	<!-- fill: #e5e7ea; -->
 	<!-- fill-opacity: .5;	 -->
@@ -76,13 +81,13 @@ div.tooltip {
 					<label for="highRisk"></label><span class="en">High Risk</span>
 				  <br/>
 				  
-				  <span style="display:inline-block; background-color:#F57A00; padding:0px; margin:0px; height:13px; width:13px; overflow:hidden"><input type="checkbox" style="opacity:0.50;padding:0px;margin:0px" name="risk" class="regular-checkbox" value="medRisk" id="medRisk" checked="true"/></span>
+				  <span style="display:inline-block; background-color:#c6891f; padding:0px; margin:0px; height:13px; width:13px; overflow:hidden"><input type="checkbox" style="opacity:0.50;padding:0px;margin:0px" name="risk" class="regular-checkbox" value="medRisk" id="medRisk" /></span>
 					<label for="medRisk"></label><span class="en">Medium Risk</span>
 				  <br/>
 				  
-				  <span style="display:inline-block; background-color:#bcb92f; padding:0px; margin:0px; height:13px; width:13px; overflow:hidden"><input type="checkbox" style="opacity:0.50;padding:0px;margin:0px" name="risk" class="regular-checkbox" value="lowRisk" id="lowRisk" /></span>
-					<label for="lowRisk"></label><span class="en">Low Risk</span>
-				  <br/>
+				  <!-- <span style="display:inline-block; background-color:#bcb92f; padding:0px; margin:0px; height:13px; width:13px; overflow:hidden"><input type="checkbox" style="opacity:0.50;padding:0px;margin:0px" name="risk" class="regular-checkbox" value="lowRisk" id="lowRisk" /></span> -->
+					<!-- <label for="lowRisk"></label><span class="en">Low Risk</span> -->
+				  <!-- <br/> -->
 				  
 				  <!-- <span style="display:inline-block; background-color:#e5e7ea; padding:0px; margin:0px; height:13px; width:13px; overflow:hidden"><input type="checkbox" style="opacity:0.50;padding:0px;margin:0px" name="vio" class="regular-checkbox" value="other" id="other" /></span> -->
 					<!-- <label for="other"></label><span class="en">Other</span> -->
@@ -128,13 +133,81 @@ var map = L.map('map').setView([40.712824, -74.005999], 11);
 L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png', {attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
 
 var tooltip = d3.select('body').append('div')
+	//settings for using hyperlink in tooltip
+	.on('mouseover', function(d, i){
+		tooltip.transition().duration(0);
+	})
+	.on('mouseout', function(d, i){
+		tooltip.transition().delay(500).style('visibility', 'hidden');
+	})
 	.attr('class', 'tooltip');
 	
 var width = $("#map").width(),
 	height = $("#map").height();
 
 
-function init(){	
+function init(){
+	var rings = [];
+	var ringsOverlay = L.d3SvgOverlay(function(sel,proj){
+		var ringsUpd = sel.selectAll('circle').data(rings);
+		ringsUpd.enter()
+			.append('circle')
+			.attr('cx',function(d){return proj.latLngToLayerPoint(d.latLng).x;})
+			.attr('cy',function(d){return proj.latLngToLayerPoint(d.latLng).y;})
+			.attr('class', function(d){
+				if (d.Score > 6){
+					return "rings";
+				}
+					return "none";
+			})
+			
+		var highRiskPnts = d3.selectAll(".rings");
+		pulsate(highRiskPnts);
+		
+		function pulsate(highRiskPnts){
+			recursive_transitions();
+			function recursive_transitions(){
+			highRiskPnts.transition()
+				<!-- .attr("class", "ring") -->
+				<!-- .style("fill", "#BF0000") -->
+				<!-- .attr("stroke", "#BF0000") -->
+				<!-- .style("opacity", 0.9) -->
+				<!-- .style("fill-opacity", 0.35) -->
+				.duration(100)
+				.attr({
+					"class": "ring",
+					"fill": "#BF0000",
+					"stroke": "#BF0000",
+					//"stroke-width": 1.5,
+					"r": (1 / proj.scale),
+					"opacity": 0.7,
+					"fill-opacity": 0.7
+				})
+				.transition()
+				.duration(2000)
+				.attr("r", (15 / proj.scale))
+				.attr("opacity", 0)
+				.each("end", recursive_transitions);
+				
+				
+				
+				
+				/*
+				.duration(100)
+				.attr("stroke-width", 1)
+				.attr("stroke", "BF0000")
+				.attr("r", 1 / proj.scale)
+				.ease('sin-in')
+				.transition()
+				.duration(1000)
+				.attr('stroke-width', 1)
+				.attr("r", 10 / proj.scale)
+				.ease('sine-out')
+				.each("end", recursive_transitions);
+				*/
+			}
+		}
+	})
 	var points = [];
 	var pointsOverlay = L.d3SvgOverlay(function(sel,proj){
 		
@@ -147,22 +220,27 @@ function init(){
 		.attr('class', function(d){
 			if (d.Score > 6){
 				return "high";
-			} else if (d.Score > 4 && d.Score < 7){
+			}   
 				return "medium";
-			}  
-				return "low";
 		})
+		
+		//.attr('r', 4 / proj.scale)
 		.on('click', function(d){
 			tooltip.style("visibility", "visible");
 			tooltip.html(
 				'BIN: ' + d.bin + '</br>' +								
-				//'ADDRESS: '+ d.houseNum +' '+d.street + ', ' + (d.BoroughName).toUpperCase() + '</br>' +
+				'ADDRESS: '+ d.Address + ', ' + d.Borough + '</br>' +
+				'COMMUNITY DISTRICT: ' + d.CD + '</br>' +
 				'RISK SCORE: ' + d.risk + '</br>' +
 				'# OF PERMITS: ' + d.NumPermits + '</br>' +
 				'# OF STORIES: ' + d.NumStories + '</br>' +
-				'NB PERMIT: ' + d.NB + '</br>' +
+				'JOB TYPE: ' + d.jobType + '</br>' +
+				'JOB NUMBER: ' + '<a href= "http://a810-bisweb.nyc.gov/bisweb/JobsQueryByNumberServlet?passjobnumber=' + d.jobNum +'" target=_blank">' + d.jobNum + "</a>" + '</br>' +
 				'SCAFFOLD/SHED/FENCE: ' + d.Scaffold + '</br>' +
-				'# OF ACCIDENTS: ' +d.Accidents
+				'# OF ACCIDENTS: ' +d.Accidents + '</br>' +
+				'CO/TCO: ' +d.CO_TCO + '</br>' +
+				'MOST RECENT CO/TCO: ' +d.CO_TCO_Date + '</br>' +
+				'CONTRACTOR: ' + d.Contractor
 			)
 			if (d3.event.pageX > (width - 200)) {
 			   tooltip.style("left", (d3.event.pageX - 350) + "px");
@@ -176,27 +254,26 @@ function init(){
 			   tooltip.style("top", (d3.event.pageY -30) + "px");
 			}				
 		})
-		.on("mousemove", function(d){
-			$(this).attr("style", "cursor: pointer; fill: #eef442; fill-opacity: 1;");
+		.on("mouseover", function(d, i){
+			tooltip.transition().duration(0); //settings for using hyperlink in tooltip
+			$(this).attr("style", "cursor: pointer; fill: #eef442; fill-opacity: 1;");			
 		})
 
-		.on("mouseout", function(){
-			$(this).attr("style", "stroke-width: 0px; fill-opacity: .5;");
-			return tooltip.style("visibility", "hidden");
+		.on("mouseout", function(d, i){			
+			$(this).attr("style", "stroke-width: 0px; fill-opacity: .7;");
+			return tooltip.transition().delay(500).style("visibility", "hidden"); //settings for using hyperlink in tooltip
 		});
 
 		//pointsUpd.attr('r', 3 / proj.scale);
 		pointsUpd.attr('r', function(d){
 			if (d.Score > 6){
-				return (6 / proj.scale);
-				//return (1 / proj.scale);
-			} else if (d.Score > 4 && d.Score < 7){
 				return (4 / proj.scale);
-			}
-				return (2 / proj.scale);
+				//return (1 / proj.scale);
+			} 
+				return (3 / proj.scale);
 		})
-
-		var highRiskPnts = d3.selectAll(".high");
+		/*
+		var highRiskPnts = d3.selectAll(".rings");
 		pulsate(highRiskPnts);
 		
 		function pulsate(highRiskPnts){
@@ -223,10 +300,46 @@ function init(){
 				.each("end", recursive_transitions);
 			}
 		}	
-		
-
-
-
+		*/
+	/*
+	var viz = d3.select("#viz")
+		.append("svg")
+		.attr("width", width)
+		.attr("height", height)
+			.append("g")
+			.attr("transform", "translate(" + width / 2 +","+ height / 2 +")")
+	
+	var speedLineGroup = viz.append("g")
+		.attr("class", "speedlines");
+	makeRings()
+	function makeRings(){
+		var highRiskPnts = pointsUpd.selectAll(".high");	
+		function myTransition(highRiskPnts){
+			var transition = d3.select(this).transition();
+			speedLineGroup.append("circle")
+				.attr({
+					"class": "ring",
+					"fill":"red",
+					"stroke":"red",
+					"cx": highRiskPnts.xcoord,
+					"cy": highRiskPnts.ycoord,
+					"r":(1 / proj.scale),
+					//"opacity": 0.4,
+					//"fill-opacity":0.1
+				})
+				.transition()
+				.duration(500)
+				.attr("r", 8 / proj.scale)
+				.attr("opacity", 0)
+				.remove();
+			var t = setInterval(function(){
+				clearInterval(t);
+				myTransition(highRiskPnts)
+			},duration);
+		}
+		highRiskPnts.each(myTransition);
+	}
+	*/
 /*		
 		//__vis apped    
 		var viz = d3.select("#viz")
@@ -311,28 +424,44 @@ function init(){
 	
 
 	d3.csv("data/SiteSafetyAutomationOutput.csv",function(data){
+				rings = data.map(function(d){
+					d.latLng = [+d.Lat,+d.Lon];
+					d.risk = [d.Score];
+				<!-- var filterData = data.filter(function(d){ -->
+					<!-- if (d.Score > 6) { -->
+						<!-- return d; -->
+					<!-- } -->
+				<!-- }) -->
+				return d;
+				});
 				points = data.map(function(d){
 				d.latLng = [+d.Lat,+d.Lon];
 				d.bin = [d.BIN];				
-				//d.houseNum = [d.HouseNumber];
-				//d.street = [d.StreetName];
-				//d.borough = [d.BoroughName];
+				d.Address = [d.Address];
+				d.Borough = [d.Borough];
+				d.CD = (d['Community Board']);
 				d.NumPermits = (d['Number of Permits']);
 				d.NumStories = (d['Number of Stories']);
-				d.NB = [d.NB];
+				d.jobType = (d['Job Type']);
+				d.jobNum = (d['Job Number']);
 				d.Scaffold = [d.ScaffoldShedFence];
 				d.Accidents = [d.Accidents];
+				d.CO_TCO = (d['CO/TCO']);
+				d.CO_TCO_Date = (d['CO/TCO Recent Date']);
 				d.risk = [d.Score];
+				d.Contractor = [d.Contractor];
 			return d;
 			});
+		ringsOverlay.addTo(map);
 		pointsOverlay.addTo(map);
+		d3.selectAll(".medium").style("display", "none");
 		d3.selectAll(".low").style("display", "none");
 	});
 }
 
 var highCheckbox = document.querySelector('input[id="highRisk"]');
 	medCheckbox = document.querySelector('input[id="medRisk"]');
-	lowCheckbox = document.querySelector('input[id="lowRisk"]');
+	//lowCheckbox = document.querySelector('input[id="lowRisk"]');
 
 
 
@@ -342,13 +471,20 @@ highCheckbox.onchange = function(){
 				return d.Score > 6;
 			})
 			.style("display", "block");
+			d3.selectAll(".rings").filter(function(d) {
+				return d.Score > 6;
+			})
+			.style("display", "block");
 
 		} else {
 			d3.selectAll(".high").filter(function(d) {
 				return d.Score > 6;
 			})
 			.style("display", "none");
-						
+			d3.selectAll(".rings").filter(function(d) {
+				return d.Score > 6;
+			})
+			.style("display", "none");			
 		}
 };	
 medCheckbox.onchange = function(){
@@ -366,21 +502,21 @@ medCheckbox.onchange = function(){
 						
 		}
 };
-lowCheckbox.onchange = function(){
-		if(this.checked){
-			d3.selectAll(".low").filter(function(d) {
-				return d.Score < 5;
-			})
-			.style("display", "block");	
+<!-- lowCheckbox.onchange = function(){ -->
+		<!-- if(this.checked){ -->
+			<!-- d3.selectAll(".low").filter(function(d) { -->
+				<!-- return d.Score < 5; -->
+			<!-- }) -->
+			<!-- .style("display", "block");	 -->
 
-		} else {
-			d3.selectAll(".low").filter(function(d) {
-				return d.Score < 5;
-			})
-			.style("display", "none");
+		<!-- } else { -->
+			<!-- d3.selectAll(".low").filter(function(d) { -->
+				<!-- return d.Score < 5; -->
+			<!-- }) -->
+			<!-- .style("display", "none"); -->
 						
-		}
-};
+		<!-- } -->
+<!-- }; -->
 
 init();
 

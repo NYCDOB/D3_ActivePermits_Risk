@@ -232,14 +232,14 @@ function init(){
 				'ADDRESS: '+ d.Address + ', ' + d.Borough + '</br>' +
 				'COMMUNITY DISTRICT: ' + d.CD + '</br>' +
 				'RISK SCORE: ' + d.risk + '</br>' +
-				'# OF PERMITS: ' + d.NumPermits + '</br>' +
+				'# OF ACTIVE PERMITS: ' + d.NumPermits + '</br>' +
 				'# OF STORIES: ' + d.NumStories + '</br>' +
 				'JOB TYPE: ' + d.jobType + '</br>' +
 				'JOB NUMBER: ' + '<a href= "http://a810-bisweb.nyc.gov/bisweb/JobsQueryByNumberServlet?passjobnumber=' + d.jobNum +'" target=_blank">' + d.jobNum + "</a>" + '</br>' +
-				'SCAFFOLD/SHED/FENCE: ' + d.Scaffold + '</br>' +
+				<!-- 'SCAFFOLD/SHED/FENCE: ' + d.Scaffold + '</br>' + -->
 				'# OF ACCIDENTS: ' +d.Accidents + '</br>' +
-				'CO/TCO: ' +d.CO_TCO + '</br>' +
-				'MOST RECENT CO/TCO: ' +d.CO_TCO_Date + '</br>' +
+				<!-- 'CO/TCO: ' +d.CO_TCO + '</br>' + -->
+				<!-- 'MOST RECENT CO/TCO: ' +d.CO_TCO_Date + '</br>' + -->
 				'CONTRACTOR: ' + d.Contractor
 			)
 			if (d3.event.pageX > (width - 200)) {
@@ -444,10 +444,10 @@ function init(){
 				d.NumStories = (d['Number of Stories']);
 				d.jobType = (d['Job Type']);
 				d.jobNum = (d['Job Number']);
-				d.Scaffold = [d.ScaffoldShedFence];
+				<!-- d.Scaffold = [d.ScaffoldShedFence]; -->
 				d.Accidents = [d.Accidents];
-				d.CO_TCO = (d['CO/TCO']);
-				d.CO_TCO_Date = (d['CO/TCO Recent Date']);
+				<!-- d.CO_TCO = (d['CO/TCO']); -->
+				<!-- d.CO_TCO_Date = (d['CO/TCO Recent Date']); -->
 				d.risk = [d.Score];
 				d.Contractor = [d.Contractor];
 			return d;

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+		<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+
+</head>
+<style>
+th{
+	background-color: #E8EBEF;
+}
+body{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+}
+</style>
+<body>
+
+		<div id="wrap">
+			<div class="container">
+            <h3>High/Medium Risk Active Permits (As of <span id="today"></span>)</h3>
+				<table id="riskTable" class="display compact"></table>
+			</div>
+		</div>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.9/d3.min.js"></script>
+
+		
+<script type="text/javascript">
+var today = new Date();
+var dd = today.getDate();
+var mm = today.getMonth()+1;
+var yyyy = today.getFullYear();
+today = mm + '/' + dd + '/' + yyyy;	
+d3.select("#today").html(today);
+
+$(document).ready(function() {
+
+	
+	$(function(){
+	
+
+			$('#riskTable').DataTable({
+				"ajax": {
+					"url": "https://raw.githubusercontent.com/NYCDOB/D3_ActivePermits_Risk/gh-pages/data/SiteSafetyAutomationOutput.json",
+					"dataSrc": ""
+				},
+				columnDefs: [{
+					targets: 1,
+					render: function(data,type,row,meta){
+						return '<a href="http://a810-bisweb.nyc.gov/bisweb/JobsQueryByNumberServlet?passjobnumber=' + data + '" target="_blank">' + data + '</a>';
+					}
+				}],
+				order: [[0, "desc"]],
+				columns: [
+					{ 	data: "Score",
+						title: "Risk Score"
+					},
+					{ 	data: "Job Number",
+						title: "Job Number"
+					},
+
+					{ 	data: "BIN", 
+						title: "BIN"
+					},
+
+					{ 	data: "Address", 
+						title: "Address"
+					},
+					{ 	data: "Borough", 
+						title: "Borough"
+					},
+					{ 	data: "Community Board", 
+						title: "Community Board"
+					},
+					{ 	data: "Number of Permits", 
+						title: "# of Active Permits"
+					},
+					{ 	data: "Number of Stories", 
+						title: "# of Stories"
+					},
+					{ 	data: "Job Type", 
+						title: "Job Type"
+					},
+					{ 	data: "Contractor",
+						title: "Contractor"
+					},
+					{ 	data: "Accidents",
+						title: "# of Accidents"
+					}
+
+				]
+			});
+	});	
+});
+</script>
+
+
+
+</body>
+</html>

@@ -74,7 +74,7 @@ div.tooltip {
 <body>
 	<div id="map">
 		<div id="ui-container" class="ui" style="z-index: 401">		
-			      <h4>Active Permits (As of <span id="today"></span>)</h4>
+			      <h4>Active Permits</h4>
 				  <h5>Risk Category</h5>
 				  
 				  <span style="display:inline-block; background-color:#BF0000; padding:0px; margin:0px; height:13px; width:13px; overflow:hidden"><input type="checkbox" style="opacity:0.50;padding:0px;margin:0px" name="risk" class="regular-checkbox" value="highRisk" id="highRisk" checked="true"/></span>
@@ -130,7 +130,7 @@ div.tooltip {
 <!-- L.control.layers(baseMaps).addTo(map); -->
 
 var map = L.map('map').setView([40.712824, -74.005999], 11);
-L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png', {attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>'}).addTo(map);
 
 var tooltip = d3.select('body').append('div')
 	//settings for using hyperlink in tooltip
